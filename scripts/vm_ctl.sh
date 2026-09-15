@@ -15,7 +15,7 @@ vm_name_input_checker() {
     fi 
 
     # Kondisi: nama VM tidak ada di list
-    if ! VBoxManage list vms | grep -q "$nama_vm"; then
+    if ! VBoxManage list vms | grep -q "\"$nama_vm\""; then
         echo "vm_ctl: VM '$nama_vm' tidak ditemukan" >&2
         exit 1
     fi
