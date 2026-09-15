@@ -1,5 +1,10 @@
 #!/bin/bash
 
+invalid_command() {
+    echo "vm_ctl: command tidak valid '$1'" >&2
+    exit 1
+}
+
 #./vm_ctl.sh list
 
 #./vm_ctl.sh info <nama_vm>
@@ -18,7 +23,10 @@ case "$1" in
     start)
         #Code
         ;;
-    snapshot create)
+    snapshot)
         #Code
+        ;;
+    *)
+        invalid_command $1
         ;;
 esac
