@@ -26,6 +26,8 @@ fi
 # Tampilan string formatting
 echo -e "$header"
 echo "Mengecek Sistem..."
+
+# Bagian nama kernel aku masih gak yakin ngambil yang mana 
 echo "OS/Kernel        :'$KERNEL_NAME' ($KERNEL_VERSION)" 
 echo "Akun Pengguna    : $LOGGED_USERS akun"
 echo "Proses Berjalan  : $RUNNING_PROCESS proses"
