@@ -53,22 +53,20 @@ vm_info() {
 
 header="===================================\nTUGAS 1 OS - KELOMPOK A04\n===================================" 
 
+echo -e "$header"
+
 case "$1" in
     list)
-        echo -e "$header"
         VBoxManage list vms
         ;;
     info)
-        echo -e "$header"
         nama_vm="$2"
         vm_name_input_checker "$nama_vm"
         ;;
     start)
-        echo -e "$header"
         #Code
         ;;
     snapshot)
-        echo -e "$header"
         #Code
         ;;
     *)
