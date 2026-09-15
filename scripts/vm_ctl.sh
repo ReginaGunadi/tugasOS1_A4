@@ -13,6 +13,27 @@ invalid_command() {
 
 #./vm_ctl.sh snapshot create <nama_vm> <nama_snapshot>  dan ./vm_ctl.sh snapshot list <nama_vm> 
 
+snapshot() {
+    case "$1" in
+        create)
+            local timestamp=$(date +"%Y-%m-%d %T")
+            local timestampf=$(date +"%Y_%m_%d_%H-%M-%S")
+            echo "Membuat snapshot '$3' pada VM '$2'..."
+            { 
+                VBoxManage snapshot "$2" take "$3-$timestampf" &> /dev/null &&
+                    echo "Snapshot '$3' berhasil dibuat pada $timestamp"
+
+            } || echo "vm_ctl: terjadi error, cek penamaan OS" 
+            ;;
+        list)
+            VBoxManage snapshot "$2" list || echo "vm_ctl: terjadi error, cek penamaan OS"
+            ;;
+        *)
+            invalid_command $1
+            ;;
+    esac
+}
+
 case "$1" in
     list)
         VBoxInfoManage list vms
@@ -24,7 +45,8 @@ case "$1" in
         #Code
         ;;
     snapshot)
-        #Code
+        shift
+        snapshot $@
         ;;
     *)
         invalid_command $1
