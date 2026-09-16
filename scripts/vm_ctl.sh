@@ -51,19 +51,18 @@ vm_info() {
 #./vm_ctl.sh snapshot create <nama_vm> <nama_snapshot>  dan ./vm_ctl.sh snapshot list <nama_vm> 
 
 vm_snapshot() {
+    local nama_vm=$2
     case "$1" in
         create)
             local timestamp=$(date +"%Y-%m-%d %T")
             local timestampf=$(date +"%Y_%m_%d_%H-%M-%S")
-            echo "Membuat snapshot '$3' pada VM '$2'..."
-            { 
-                VBoxManage snapshot "$2" take "$3-$timestampf" &> /dev/null &&
-                    echo "Snapshot '$3' berhasil dibuat pada $timestamp"
-
-            } || echo "vm_ctl: terjadi error, cek penamaan OS" 
+            echo "Membuat snapshot '$3' pada VM '$nama_vm'..."
+            VBoxManage snapshot "$nama_vm" take "$3-$timestampf" &> /dev/null &&
+                echo "Snapshot '$3' berhasil dibuat pada $timestamp"
             ;;
         list)
-            VBoxManage snapshot "$2" list || echo "vm_ctl: terjadi error, cek penamaan OS"
+            echo " Daftar snapshot yang ada untuk vm '$nama_vm':"
+            VBoxManage snapshot "$nama_vm" list | awk -n 'BEGIN { i=1; } { printf "  %d. %s\n", i, $2; i+=1; }'
             ;;
         *)
             invalid_command $1
@@ -88,8 +87,9 @@ case "$1" in
         #Code
         ;;
     snapshot)
-        echo -e "$header"
-        #Code
+        shift
+        vm_name_input_checker "$2"
+        vm_snapshot $@
         ;;
     *)
         invalid_command $1
