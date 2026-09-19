@@ -41,6 +41,60 @@ vm_info() {
     echo "Status saat ini     : $status"
 }
 
+vm_start() {
+    local nama_vm="$1"
+
+    # Nyalakan VM secara headless (tanpa GUI)
+    echo "Menyalakan VM '$nama_vm' secara headless..."
+    VBoxManage startvm "$nama_vm" --type headless &> /dev/null
+
+    # Cek apakah perintah start berhasil dijalankan
+    if [ $? -eq 0 ]; then
+        status=$(VBoxManage showvminfo "$nama_vm" | grep "^State" | awk '{print $2}')
+        echo "VM '$nama_vm' berhasil dinyalakan. Status: $status"
+    else
+        echo "vm_ctl: gagal menyalakan VM '$nama_vm'" >&2
+        exit 1
+    fi
+}
+
+vm_stop() {
+    local nama_vm="$1"
+
+    # Kirim sinyal shutdown aman (ACPI power button)
+    echo "Mematikan VM '$nama_vm' secara aman..."
+    VBoxManage controlvm "$nama_vm" acpipowerbutton &> /dev/null
+
+    # Cek apakah sinyal shutdown berhasil terkirim
+    if [ $? -ne 0 ]; then
+        echo "vm_ctl: gagal mengirim perintah shutdown ke VM '$nama_vm'" >&2
+        exit 1
+    fi
+
+     # Tunggu (polling) sampai VM benar-benar mati, maksimal 30 detik
+    local max_tunggu=30
+    local waktu=0
+    local status=""
+
+    while [ $waktu -lt $max_tunggu ]; do
+        status=$(VBoxManage showvminfo "$nama_vm" | grep "^State" | awk '{print $2}')
+
+        if [ "$status" = "powered" ]; then
+            break
+        fi
+
+        sleep 1
+        waktu=$((waktu + 1))
+    done
+
+    # Tampilkan hasil akhir setelah polling selesai/timeout
+    if [ "$status" = "powered" ]; then
+        echo "VM '$nama_vm' berhasil dimatikan. Status: powered off"
+    else
+        echo "vm_ctl: VM '$nama_vm' belum mati setelah ${max_tunggu} detik (status: $status)" >&2
+        exit 1
+    fi
+}
 
 #./vm_ctl.sh list
 
@@ -84,7 +138,14 @@ case "$1" in
         vm_info "$nama_vm"
         ;;
     start)
-        #Code
+        nama_vm="$2"
+        vm_name_input_checker "$nama_vm"
+        vm_start "$nama_vm"
+        ;;
+    stop)
+        nama_vm="$2"
+        vm_name_input_checker "$nama_vm"
+        vm_stop "$nama_vm"
         ;;
     snapshot)
         shift
