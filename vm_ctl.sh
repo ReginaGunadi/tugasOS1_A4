@@ -1,8 +1,27 @@
 #!/bin/bash
 
+# Utilitas
 invalid_command() {
     echo "vm_ctl: command tidak valid '$1'" >&2
     exit 1
+}
+
+vm_name_input_checker() {
+    local nama_vm="$1"
+
+    # Kondisi: inputnya kosong
+    if [ -z "$nama_vm" ]; then
+        echo "vm_ctl: nama VM harus diisi" >&2
+        exit 1
+    fi 
+
+    # Kondisi: nama VM tidak ada di list
+    if ! VBoxManage list vms | grep -q "\"$nama_vm\""; then
+        echo "vm_ctl: VM '$nama_vm' tidak ditemukan" >&2
+        exit 1
+    fi
+
+    # Kondisi: valid -> tidak akan exit
 }
 
 #./vm_ctl.sh list
@@ -16,26 +35,7 @@ vm_list() {
     VBoxManage list vms | awk -F'"' '{print $2}' | awk '{printf "  %d. %s\n", NR, $1}'
 }
 
-
 #./vm_ctl.sh info <nama_vm>
-vm_name_input_checker() {
-    local nama_vm="$1"
-
-    # Kondisi: inputnya kosong
-    if [ -z "$nama_vm" ]; then
-        echo "vm_ctl: nama VM harus diisi"
-        exit 1
-    fi 
-
-    # Kondisi: nama VM tidak ada di list
-    if ! VBoxManage list vms | grep -q "\"$nama_vm\""; then
-        echo "vm_ctl: VM '$nama_vm' tidak ditemukan" >&2
-        exit 1
-    fi
-
-    # Kondisi: valid -> tidak akan exit
-}
-
 vm_info() {
     local nama_vm="$1" 
     
@@ -115,18 +115,32 @@ vm_stop() {
 #./vm_ctl.sh snapshot create <nama_vm> <nama_snapshot>  dan ./vm_ctl.sh snapshot list <nama_vm> 
 vm_snapshot() {
     local nama_vm=$2
+
     case "$1" in
         create)
+            local nama_snapshot="$3"
+            if [ -z $nama_snapshot ]; then
+                echo "vm_ctl: nama snapshot harus diisi" >&2
+                exit 1
+            fi
+
+            # Timestamp untuk ditampilkan
             local timestamp=$(date +"%Y-%m-%d %T")
+
+            # Timestamp untuk nama snapshot
             local timestampf=$(date +"%Y_%m_%d_%H-%M-%S")
-            echo "Membuat snapshot '$3' pada VM '$nama_vm'..."
-            VBoxManage snapshot "$nama_vm" take "$3-$timestampf" &> /dev/null &&
-                echo "Snapshot '$3' berhasil dibuat pada $timestamp"
+
+            echo "Membuat snapshot '$nama_snapshot' pada VM '$nama_vm'..."
+
+            VBoxManage snapshot "$nama_vm" take "$nama_snapshot-$timestampf" &> /dev/null &&
+                echo "Snapshot '$nama_snapshot' berhasil dibuat pada $timestamp"
             ;;
+
         list)
             echo " Daftar snapshot yang ada untuk vm '$nama_vm':"
-            VBoxManage snapshot "$nama_vm" list | awk -n 'BEGIN { i=1; } { printf "  %d. %s\n", i, $2; i+=1; }'
+            VBoxManage snapshot "$nama_vm" list | awk '{ printf "  %d. %s\n", NR, $2 }'
             ;;
+
         *)
             invalid_command $1
             ;;
@@ -160,8 +174,9 @@ case "$1" in
         vm_stop "$nama_vm"
         ;;
     snapshot)
-        shift
-        vm_name_input_checker "$2"
+        shift # Mengubah penomoran args menjadi N+1, agar seragam dengan yang lain
+        nama_vm="$2"
+        vm_name_input_checker "$nama_vm"
         vm_snapshot $@
         ;;
     *)
