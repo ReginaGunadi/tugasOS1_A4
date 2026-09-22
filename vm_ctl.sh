@@ -5,6 +5,19 @@ invalid_command() {
     exit 1
 }
 
+#./vm_ctl.sh list
+vm_list() {
+    # String formatting
+    echo "Memindai daftar Virtual Machine..."
+    echo ""
+    echo "Daftar VM terdaftar:"
+
+    # List virtual machines dengan displit pada '"' dan dilist dengan Number Row (NR)
+    VBoxManage list vms | awk -F'"' '{print $2}' | awk '{printf "  %d. %s\n", NR, $1}'
+}
+
+
+#./vm_ctl.sh info <nama_vm>
 vm_name_input_checker() {
     local nama_vm="$1"
 
@@ -41,6 +54,8 @@ vm_info() {
     echo "Status saat ini     : $status"
 }
 
+
+#./vm_ctl.sh start <nama_vm> dan ./vm_ctl.sh stop <nama_vm>
 vm_start() {
     local nama_vm="$1"
 
@@ -96,14 +111,8 @@ vm_stop() {
     fi
 }
 
-#./vm_ctl.sh list
-
-#./vm_ctl.sh info <nama_vm>
-
-#./vm_ctl.sh start <nama_vm> dan ./vm_ctl.sh stop <nama_vm>
 
 #./vm_ctl.sh snapshot create <nama_vm> <nama_snapshot>  dan ./vm_ctl.sh snapshot list <nama_vm> 
-
 vm_snapshot() {
     local nama_vm=$2
     case "$1" in
@@ -124,13 +133,16 @@ vm_snapshot() {
     esac
 }
 
+
+
+# Main Program Logic
 header="===================================\nTUGAS 1 OS - KELOMPOK A04\n===================================" 
 
 echo -e "$header"
 
 case "$1" in
     list)
-        VBoxManage list vms
+        vm_list
         ;;
     info)
         nama_vm="$2"
