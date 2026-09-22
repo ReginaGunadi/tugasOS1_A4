@@ -119,7 +119,7 @@ vm_snapshot() {
     case "$1" in
         create)
             local nama_snapshot="$3"
-            if [ -z nama_snapshot ]; then
+            if [ -z $nama_snapshot ]; then
                 echo "vm_ctl: nama snapshot harus diisi" >&2
                 exit 1
             fi
