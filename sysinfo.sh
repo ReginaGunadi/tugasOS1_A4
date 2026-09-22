@@ -44,9 +44,31 @@ SWAP_FREE_TOTAL=$(free | awk 'NR == 3 { printf "%d / %d", $3, $2 }')
 SWAP=$(echo "$SWAP_FREE_TOTAL * 100" | bc -l)
 
 # Memberi input ke resource-check dan mengambil outputnya
-METRIC_VERDICT=$(echo $MEM $SWAP | ./resource-check)
+METRIC_VERDICT=$(echo $MEM $SWAP | ./resource_check)
 MEM_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $1 }')
 SWAP_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $2 }')
 
 printf "Memory usage  : %02.0f%%   [ $MEM_VERDICT ]\n" $MEM
 printf "Swap usage    : %02.0f%%   [ $SWAP_VERDICT ]\n" $SWAP
+
+echo ""
+echo "Menyimpan laporan ke sysinfo_report.txt..."
+
+REPORT_FILE="sysinfo_report.txt"
+
+{
+    echo "=========================================================================="
+    echo "                       TUGAS 1 OS - KELOMPOK A04"
+    echo "=========================================================================="
+    printf "%-15s | %-17s | %-6s | %-25s\n" "Check Category" "Item" "Status" "Details"
+    echo "--------------------------------------------------------------------------"
+    printf "%-15s | %-17s | %-6s | %-25s\n" "OS" "$KERNEL_NAME" "PASS" "$KERNEL_VERSION"
+    printf "%-15s | %-17s | %-6s | %-25s\n" "Users" "Regular accounts" "PASS" "$LOGGED_USERS akun"
+    printf "%-15s | %-17s | %-6s | %-25s\n" "Processes" "Running" "PASS" "$RUNNING_PROCESS proses"
+    printf "%-15s | %-17s | %-6s | %-25s\n" "Virtualization" "Hypervisor" "PASS" "$VIRT_STATUS"
+    printf "%-15s | %-17s | %-6s | %-25.0f%%\n" "Memory" "Metrik 1" "$MEM_VERDICT" "$MEM"
+    printf "%-15s | %-17s | %-6s | %-25.0f%%\n" "Swap" "Metrik 2" "$SWAP_VERDICT" "$SWAP"
+    echo "=========================================================================="
+} > "$REPORT_FILE"
+
+echo "Laporan berhasil disimpan."
