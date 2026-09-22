@@ -32,3 +32,21 @@ echo "OS/Kernel        :'$KERNEL_NAME' ($KERNEL_VERSION)"
 echo "Akun Pengguna    : $LOGGED_USERS akun"
 echo "Proses Berjalan  : $RUNNING_PROCESS proses"
 echo "Virtualisasi     : $VIRT_STATUS"
+
+echo ""
+echo "Menghitung metrik varian kelompok..."
+
+# Menghitung persentase usage memory dan swap
+MEM_FREE_TOTAL=$(free | awk 'NR == 2 { printf "%d / %d", $3, $2 }') 
+MEM=$(echo "$MEM_FREE_TOTAL * 100" | bc -l)
+
+SWAP_FREE_TOTAL=$(free | awk 'NR == 3 { printf "%d / %d", $3, $2 }')
+SWAP=$(echo "$SWAP_FREE_TOTAL * 100" | bc -l)
+
+# Memberi input ke resource-check dan mengambil outputnya
+METRIC_VERDICT=$(echo $MEM $SWAP | ./resource-check)
+MEM_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $1 }')
+SWAP_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $2 }')
+
+printf "Memory usage  : %02.0f%%   [ $MEM_VERDICT ]\n" $MEM
+printf "Swap usage    : %02.0f%%   [ $SWAP_VERDICT ]\n" $SWAP
