@@ -18,11 +18,11 @@ ARCH=$(uname -m)
 # Jumlah akun pengguna biasa
 LOGGED_USERS=$(getent passwd | grep -vE 'nologin|false' | wc -l)
 
-# Jumlah proses yang berjalan
-RUNNING_PROCESS=$(ps -e | wc -l)
+# Jumlah proses yang berjalan (dikurangi 1 karena header termasuk)
+RUNNING_PROCESS=$(($(ps -e | wc -l) - 1))
 
 # Deteksi sistem yang berjalan di VM
-if [ -f /sys/class/dmi/id/product_name ]; then
+if [ -s /sys/class/dmi/id/product_name ]; then
     VIRT_NAME=$(cat /sys/class/dmi/id/product_name)
     VIRT_STATUS="Terdeteksi ($VIRT_NAME)"
 else
@@ -35,7 +35,7 @@ echo -e "$header"
 echo "Mengecek Sistem..."
 
 # Bagian nama kernel aku masih gak yakin ngambil yang mana 
-echo "OS/Kernel        :$OS_NAME ($KERNEL_REL)" 
+echo "OS/Kernel        : $OS_NAME ($KERNEL_REL)" 
 echo "Akun Pengguna    : $LOGGED_USERS akun"
 echo "Proses Berjalan  : $RUNNING_PROCESS proses"
 echo "Virtualisasi     : $VIRT_STATUS"
