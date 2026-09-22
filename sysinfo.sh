@@ -3,9 +3,16 @@
 header="===================================\nTUGAS 1 OS - KELOMPOK A04\n===================================" 
 
 # Info OS/kernel
-KERNEL_NAME=$(uname -s)
-KERNEL_RELEASE=$(uname -r)
-KERNEL_VERSION=$(uname -v)
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    # Mengambil 'nama cantik' dari current OSnya, seperti "Ubuntu 24.04 LTS"
+    OS_NAME="$PRETTY_NAME"
+else
+    OS_NAME=$(uname -s) # Else, mengambil "Linux"
+fi
+
+# Mengambil release version dari current OS dengan memotong pada bagian dengan "-"
+KERNEL_REL=$(uname -r | cut -d'-' -f1)
 ARCH=$(uname -m)
 
 # Jumlah akun pengguna biasa
@@ -28,7 +35,7 @@ echo -e "$header"
 echo "Mengecek Sistem..."
 
 # Bagian nama kernel aku masih gak yakin ngambil yang mana 
-echo "OS/Kernel        :'$KERNEL_NAME' ($KERNEL_VERSION)" 
+echo "OS/Kernel        :$OS_NAME ($KERNEL_REL)" 
 echo "Akun Pengguna    : $LOGGED_USERS akun"
 echo "Proses Berjalan  : $RUNNING_PROCESS proses"
 echo "Virtualisasi     : $VIRT_STATUS"
