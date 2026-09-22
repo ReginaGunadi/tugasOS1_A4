@@ -58,6 +58,25 @@ SWAP_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $2 }')
 printf "Memory usage  : %02.0f%%   [ $MEM_VERDICT ]\n" $MEM
 printf "Swap usage    : %02.0f%%   [ $SWAP_VERDICT ]\n" $SWAP
 
+# Bulatkan angka desimal ke 2 angka di belakang koma
+MEM_ROUNDED=$(printf "%.2f" "$MEM")
+SWAP_ROUNDED=$(printf "%.2f" "$SWAP")
+
+# Tentukan deskripsi Details berdasarkan status
+case "$MEM_VERDICT" in
+    PASS) MEM_DETAIL="Normal" ;;
+    WARN) MEM_DETAIL="Mulai penuh" ;;
+    FAIL) MEM_DETAIL="Kritis" ;;
+    *) MEM_DETAIL="Tidak diketahui" ;;
+esac
+
+case "$SWAP_VERDICT" in
+    PASS) SWAP_DETAIL="Normal" ;;
+    WARN) SWAP_DETAIL="Mulai terpakai" ;;
+    FAIL) SWAP_DETAIL="Kritis" ;;
+    *) SWAP_DETAIL="Tidak diketahui" ;;
+esac
+
 echo ""
 echo "Menyimpan laporan ke sysinfo_report.txt..."
 
@@ -67,15 +86,16 @@ REPORT_FILE="sysinfo_report.txt"
     echo "=========================================================================="
     echo "                       TUGAS 1 OS - KELOMPOK A04"
     echo "=========================================================================="
-    printf "%-15s | %-17s | %-6s | %-25s\n" "Check Category" "Item" "Status" "Details"
-    echo "--------------------------------------------------------------------------"
-    printf "%-15s | %-17s | %-6s | %-25s\n" "OS" "$KERNEL_NAME" "PASS" "$KERNEL_VERSION"
-    printf "%-15s | %-17s | %-6s | %-25s\n" "Users" "Regular accounts" "PASS" "$LOGGED_USERS akun"
-    printf "%-15s | %-17s | %-6s | %-25s\n" "Processes" "Running" "PASS" "$RUNNING_PROCESS proses"
-    printf "%-15s | %-17s | %-6s | %-25s\n" "Virtualization" "Hypervisor" "PASS" "$VIRT_STATUS"
-    printf "%-15s | %-17s | %-6s | %-25.0f%%\n" "Memory" "Metrik 1" "$MEM_VERDICT" "$MEM"
-    printf "%-15s | %-17s | %-6s | %-25.0f%%\n" "Swap" "Metrik 2" "$SWAP_VERDICT" "$SWAP"
-    echo "=========================================================================="
+    printf "+%-16s+%-19s+%-8s+%-27s+\n" "----------------" "-------------------" "--------" "---------------------------"
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " Check Category " " Item " " Status " " Details "
+    printf "+%-16s+%-19s+%-8s+%-27s+\n" "----------------" "-------------------" "--------" "---------------------------"
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " OS " " $KERNEL_NAME " " PASS " " $KERNEL_VERSION "
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " Users " " Regular accounts " " PASS " " $LOGGED_USERS akun "
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " Processes " " Running " " PASS " " $RUNNING_PROCESS proses "
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " Virtualization " " Hypervisor " " PASS " " $VIRT_STATUS "
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " Memory " " ${MEM_ROUNDED}% " " $MEM_VERDICT " " $MEM_DETAIL "
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " Swap " " ${SWAP_ROUNDED}% " " $SWAP_VERDICT " " $SWAP_DETAIL "
+    printf "+%-16s+%-19s+%-8s+%-27s+\n" "----------------" "-------------------" "--------" "---------------------------"
 } > "$REPORT_FILE"
 
 echo "Laporan berhasil disimpan."
