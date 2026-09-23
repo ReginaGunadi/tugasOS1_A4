@@ -46,12 +46,14 @@ echo "Menghitung metrik varian kelompok..."
 MEM_FREE_TOTAL=$(free | awk 'NR == 2 { printf "%d / %d", $3, $2 }') 
 MEM=$(echo "$MEM_FREE_TOTAL * 100" | bc -l)
 
-SWAP_FREE_TOTAL=$(free | awk 'NR == 3 { printf "%d / %d", $3, $2 }')
-SWAP=$(echo "$SWAP_FREE_TOTAL * 100" | bc -l)
+SWAP_FREE=$(free | awk 'NR == 3 { print $3 }')
+SWAP_TOTAL=$(free | awk 'NR == 3 { print $2 }')
 
-# Fallback: kalau SWAP kosong/gagal dihitung (misal VM tidak punya swap space)
-if [ -z "$SWAP" ]; then
+# Jika mesin tidak mempunyai swap
+if [ $SWAP_TOTAL -eq 0 ]; then 
     SWAP=0
+else 
+    SWAP=$(echo "$SWAP_FREE / $SWAP_TOTAL * 100" | bc -l)
 fi
 
 # Memberi input ke resource-check dan mengambil outputnya
@@ -59,12 +61,12 @@ METRIC_VERDICT=$(echo $MEM $SWAP | ./resource_check)
 MEM_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $1 }')
 SWAP_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $2 }')
 
-printf "Memory usage  : %02.0f%%   [ $MEM_VERDICT ]\n" $MEM
-printf "Swap usage    : %02.0f%%   [ $SWAP_VERDICT ]\n" $SWAP
-
 # Bulatkan angka desimal ke 2 angka di belakang koma
-MEM_ROUNDED=$(printf "%.2f" "$MEM")
-SWAP_ROUNDED=$(printf "%.2f" "$SWAP")
+MEM_ROUNDED=$(printf "%05.2f" "$MEM")
+SWAP_ROUNDED=$(printf "%05.2f" "$SWAP")
+
+echo "Memory usage  : $MEM_ROUNDED%  [ $MEM_VERDICT ]"
+echo "Swap usage    : $SWAP_ROUNDED%  [ $SWAP_VERDICT ]"
 
 # Tentukan deskripsi Details berdasarkan status
 case "$MEM_VERDICT" in
