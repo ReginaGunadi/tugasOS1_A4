@@ -34,7 +34,7 @@ fi
 echo -e "$header"
 echo "Mengecek Sistem..."
 
-echo "OS/Kernel        :$OS_NAME ($KERNEL_REL)" 
+echo "OS/Kernel        : $OS_NAME (Kernel $KERNEL_REL)" 
 echo "Akun Pengguna    : $LOGGED_USERS akun"
 echo "Proses Berjalan  : $RUNNING_PROCESS proses"
 echo "Virtualisasi     : $VIRT_STATUS"
