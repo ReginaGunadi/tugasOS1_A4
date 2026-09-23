@@ -6,8 +6,8 @@
 +----------------+-------------------+--------+---------------------------+
 | OS             | Ubuntu 26.04 LTS  | PASS   | Kernel 7.0.0              |
 | Users          | Regular accounts  | PASS   | 4 akun                    |
-| Processes      | Running           | PASS   | 132 proses                |
+| Processes      | Running           | PASS   | 123 proses                |
 | Virtualization | Hypervisor        | PASS   | Terdeteksi (VirtualBox)   |
-| Memory         | 24.65%            | PASS   | Normal                    |
-| Swap           | 0.00%             | PASS   | Normal                    |
+| Memory         | 13.44%            | PASS   | Normal                    |
+| Swap           | 00.00%            | PASS   | Normal                    |
 +----------------+-------------------+--------+---------------------------+
