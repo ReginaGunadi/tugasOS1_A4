@@ -13,7 +13,6 @@ fi
 
 # Mengambil release version dari current OS dengan memotong pada bagian dengan "-"
 KERNEL_REL=$(uname -r | cut -d'-' -f1)
-ARCH=$(uname -m)
 
 # Jumlah akun pengguna biasa
 LOGGED_USERS=$(getent passwd | grep -vE 'nologin|false' | wc -l)
@@ -50,20 +49,20 @@ SWAP_FREE=$(free | awk 'NR == 3 { print $3 }')
 SWAP_TOTAL=$(free | awk 'NR == 3 { print $2 }')
 
 # Jika mesin tidak mempunyai swap
-if [ $SWAP_TOTAL -eq 0 ]; then 
+if [ "$SWAP_TOTAL" -eq 0 ]; then 
     SWAP=0
 else 
     SWAP=$(echo "$SWAP_FREE / $SWAP_TOTAL * 100" | bc -l)
 fi
 
 # Memberi input ke resource-check dan mengambil outputnya
-METRIC_VERDICT=$(echo $MEM $SWAP | ./resource_check)
-MEM_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $1 }')
-SWAP_VERDICT=$(echo $METRIC_VERDICT | awk '{ print $2 }')
+METRIC_VERDICT=$(echo "$MEM $SWAP" | ./resource_check)
+MEM_VERDICT=$(echo "$METRIC_VERDICT" | awk '{ print $1 }')
+SWAP_VERDICT=$(echo "$METRIC_VERDICT" | awk '{ print $2 }')
 
 # Bulatkan angka desimal ke 2 angka di belakang koma
-MEM_ROUNDED=$(printf "%05.2f" "$MEM")
-SWAP_ROUNDED=$(printf "%05.2f" "$SWAP")
+MEM_ROUNDED=$(LC_NUMERIC=C printf "%05.2f" "$MEM")
+SWAP_ROUNDED=$(LC_NUMERIC=C printf "%05.2f" "$SWAP")
 
 echo "Memory usage  : $MEM_ROUNDED%  [ $MEM_VERDICT ]"
 echo "Swap usage    : $SWAP_ROUNDED%  [ $SWAP_VERDICT ]"

@@ -179,16 +179,18 @@ vm_snapshot() {
     case "$1" in
         create)
             local nama_snapshot="$3"
-            if [ -z $nama_snapshot ]; then
+            if [ -z "$nama_snapshot" ]; then
                 echo "vm_ctl: nama snapshot harus diisi" >&2
                 exit 1
             fi
 
             # Timestamp untuk ditampilkan
-            local timestamp=$(date +"%Y-%m-%d %T")
+            local timestamp
+            timestamp=$(date +"%Y-%m-%d %T")
 
             # Timestamp untuk nama snapshot
-            local timestampf=$(date +"%Y_%m_%d_%H-%M-%S")
+            local timestampf
+            timestampf=$(date +"%Y_%m_%d_%H-%M-%S")
 
             echo "Membuat snapshot '$nama_snapshot' pada VM '$nama_vm'..."
 
@@ -202,7 +204,7 @@ vm_snapshot() {
             ;;
 
         *)
-            invalid_command $1
+            invalid_command "$1"
             ;;
     esac
 }
@@ -237,7 +239,7 @@ case "$1" in
         shift # Mengubah penomoran args menjadi N+1, agar seragam dengan yang lain
         nama_vm="$2"
         vm_name_input_checker "$nama_vm"
-        vm_snapshot $@
+        vm_snapshot "$@"
         ;;
     help)
         subcommand="$2"
@@ -251,6 +253,6 @@ case "$1" in
         esac
         ;;
     *)
-        invalid_command $1
+        invalid_command "$1"
         ;;
 esac
