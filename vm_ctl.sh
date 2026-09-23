@@ -3,6 +3,7 @@
 # Utilitas
 invalid_command() {
     echo "vm_ctl: command tidak valid '$1'" >&2
+    echo "gunakan 'vm_ctl help' untuk menampilkan panduan" >&2
     exit 1
 }
 
@@ -23,6 +24,65 @@ vm_name_input_checker() {
 
     # Kondisi: valid -> tidak akan exit
 }
+
+# String usage untuk panduan command
+USAGE=$(cat << END 
+usage: vm_ctl <command> [<args>]
+
+command:
+    list        menampilkan list dari semua vm yang terdaftar 
+    info        menampilkan informasi memori dan cpu dari sebuah vm
+    start       menyalakan vm secara headless
+    stop        mematikan vm secara aman
+    snapshot    membuat atau menampilkan list snapshot dari vm
+    help        menampilkan panduan command
+
+gunakan 'vm_ctl help <command>' untuk memuat panduan lebih lengkap terhadap suatu command spesifik
+END
+)
+
+USAGE_LIST=$(cat << END
+usage: vm_ctl list
+
+description:
+    Menampilkan list dari semua vm yang terdaftar.
+END
+)
+
+USAGE_INFO=$(cat << END
+usage: vm_ctl info <nama_vm>
+
+description:
+    Menampilkan informasi memori dan cpu dari vm <nama_vm>.
+END
+)
+
+USAGE_START=$(cat << END
+usage: vm_ctl start <nama_vm>
+
+description:
+    Menyalakan vm <nama_vm> secara headless, tanpa GUI
+END
+)
+
+USAGE_STOP=$(cat << END
+usage: vm_ctl stop <nama_vm>
+
+description:
+    Mematikan vm secara aman. Menunggu maksimal 30 detik untuk menerima status shutdown berhasil.
+END
+)
+
+USAGE_SNAPSHOT=$(cat << END
+usage: 
+    vm_ctl snapshot create <nama_vm> <nama_snapshot>
+    vm_ctl snapshot list <nama_vm>
+    
+command:
+    create      membuat snapshot ber-timestamp untuk <nama_vm> dengan nama <nama_snapshot>
+    list        menampilkan list dari semua snapshot yang ada untuk <nama_vm>
+END
+)
 
 #./vm_ctl.sh list
 vm_list() {
@@ -178,6 +238,17 @@ case "$1" in
         nama_vm="$2"
         vm_name_input_checker "$nama_vm"
         vm_snapshot $@
+        ;;
+    help)
+        subcommand="$2"
+        case "$subcommand" in
+            list)       echo "$USAGE_LIST";;
+            info)       echo "$USAGE_INFO";;
+            start)      echo "$USAGE_START";;
+            stop)       echo "$USAGE_STOP";;
+            snapshot)   echo "$USAGE_SNAPSHOT";;
+            *)          echo "$USAGE";;
+        esac
         ;;
     *)
         invalid_command $1

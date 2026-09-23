@@ -34,8 +34,7 @@ fi
 echo -e "$header"
 echo "Mengecek Sistem..."
 
-# Bagian nama kernel aku masih gak yakin ngambil yang mana 
-echo "OS/Kernel        : $OS_NAME ($KERNEL_REL)" 
+echo "OS/Kernel        :$OS_NAME ($KERNEL_REL)" 
 echo "Akun Pengguna    : $LOGGED_USERS akun"
 echo "Proses Berjalan  : $RUNNING_PROCESS proses"
 echo "Virtualisasi     : $VIRT_STATUS"
@@ -49,6 +48,11 @@ MEM=$(echo "$MEM_FREE_TOTAL * 100" | bc -l)
 
 SWAP_FREE_TOTAL=$(free | awk 'NR == 3 { printf "%d / %d", $3, $2 }')
 SWAP=$(echo "$SWAP_FREE_TOTAL * 100" | bc -l)
+
+# Fallback: kalau SWAP kosong/gagal dihitung (misal VM tidak punya swap space)
+if [ -z "$SWAP" ]; then
+    SWAP=0
+fi
 
 # Memberi input ke resource-check dan mengambil outputnya
 METRIC_VERDICT=$(echo $MEM $SWAP | ./resource_check)
@@ -89,7 +93,7 @@ REPORT_FILE="sysinfo_report.txt"
     printf "+%-16s+%-19s+%-8s+%-27s+\n" "----------------" "-------------------" "--------" "---------------------------"
     printf "|%-16s|%-19s|%-8s|%-27s|\n" " Check Category " " Item " " Status " " Details "
     printf "+%-16s+%-19s+%-8s+%-27s+\n" "----------------" "-------------------" "--------" "---------------------------"
-    printf "|%-16s|%-19s|%-8s|%-27s|\n" " OS " " $OS_NAME " " PASS " " $KERNEL_NAME $KERNEL_VERSION "
+    printf "|%-16s|%-19s|%-8s|%-27s|\n" " OS " " $OS_NAME " " PASS " " Kernel $KERNEL_REL "
     printf "|%-16s|%-19s|%-8s|%-27s|\n" " Users " " Regular accounts " " PASS " " $LOGGED_USERS akun "
     printf "|%-16s|%-19s|%-8s|%-27s|\n" " Processes " " Running " " PASS " " $RUNNING_PROCESS proses "
     printf "|%-16s|%-19s|%-8s|%-27s|\n" " Virtualization " " Hypervisor " " PASS " " $VIRT_STATUS "
